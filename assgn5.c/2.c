@@ -1,6 +1,3 @@
-/*
-   Mani Kiran , 2212056
-*/
 #include <stdio.h>
 #include <stdlib.h>
 

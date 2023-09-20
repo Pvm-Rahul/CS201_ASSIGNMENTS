@@ -1,3 +1,6 @@
+/*
+   Mani Kiran , 2212056
+*/
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -5,27 +8,42 @@ struct Node {
     int data;
     struct Node* next;
 };
-void appendNode(struct Node** head, int data) {
-    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-    if (newNode == NULL) {
-        printf("Memory allocation failed.\n");
-        exit(1);
-    }
-    
-    newNode->data = data;
-    newNode->next = NULL;
 
-    if (*head == NULL) {
-        *head = newNode; // If the list is empty, make the new node the head.
-    } else {
-        struct Node* current = *head;
-        while (current->next != NULL) {
-            current = current->next;
-        }
-        current->next = newNode;
+struct Node* reverseBetween(struct Node* head, int m, int n) {
+    if (m == n || head == NULL || head->next == NULL) {
+        return head;
     }
+
+    struct Node dummy; 
+    dummy.next = head;
+    struct Node* prevM = &dummy;
+    struct Node* currM;
+    struct Node* prev = NULL;
+    struct Node* curr = head;
+    int position = 1;
+
+    while (position < m) {
+        prevM = prevM->next;
+        curr = curr->next;
+        position++;
+    }
+    currM = curr;
+
+    while (position <= n) {
+        struct Node* next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+        position++;
+    }
+
+    prevM->next = prev;
+    currM->next = curr;
+
+    return dummy.next;
 }
-void displayList(struct Node* head) {
+
+void printLinkedList(struct Node* head) {
     struct Node* current = head;
     while (current != NULL) {
         printf("%d -> ", current->data);
@@ -33,64 +51,44 @@ void displayList(struct Node* head) {
     }
     printf("NULL\n");
 }
-void reverseBetween(struct Node* head, int m, int n) {
-    if (head == NULL || m >= n) {
-        return ;
+
+struct Node* insert(struct Node* head, int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        return newNode;
     }
 
-    struct Node* dummy = (struct Node*)malloc(sizeof(struct Node));
-    dummy->next = head;
-    struct Node* preM = dummy; // Node before the mth node
-    struct Node* nodeM, *nodeN; // mth and nth nodes
-    struct Node* postN; // Node after the nth node
+    struct Node* current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
 
-    // Traverse to find preM and nodeM
-    for (int i = 1; i < m; i++) {
-        preM = preM->next;
-    }
-    nodeM = preM->next;
-// Traverse to find nodeN and postN
-    for (int i = m; i < n; i++) {
-        preM->next = nodeM->next; // Remove nodeM from its position
-        nodeN = nodeM->next;
-        nodeM->next = nodeN->next; // Insert nodeN after preM
-        nodeN->next = preM->next;
-        preM->next = nodeN;
-    }
-    struct Node* newHead = dummy->next;
-    free(dummy);
-    printf("the final list is\n");
-    displayList(newHead);
-}    
+    current->next = newNode;
+    return head;
+}
+
 int main() {
-    struct Node* head = NULL; // Initialize an empty linked list.
-    int input;
+    struct Node* head = NULL;
 
-    printf("Enter elements for the linked list (enter -1 to stop):\n");
+    head = insert(head, 1);
+    head = insert(head, 2);
+    head = insert(head, 3);
+    head = insert(head, 4);
+    head = insert(head, 5);
 
-    while (1) {
-        printf("Enter an element: ");
-        scanf("%d", &input);
+    printf("Original linked list: ");
+    printLinkedList(head);
 
-        if (input == -1) {
-            break; // Exit the loop when the user enters -1.
-        }
+    int m = 2; 
+    int n = 4; 
 
-        appendNode(&head, input); // Add the input to the linked list.
-    }
+    head = reverseBetween(head, m, n);
 
-    printf("Linked list elements: ");
-    displayList(head);
-    int m,n; 
-    printf("Enther the positons to shift/n");
-    scanf("%d %d",&m,&n);
-    reverseBetween(head,m,n);
-    // Free the memory allocated for the linked list nodes.
-    while (head != NULL) {
-        struct Node* temp = head;
-        head = head->next;
-        free(temp);
-    }
+    printf("Reversed linked list from position %d to %d: ", m, n);
+    printLinkedList(head);
 
     return 0;
 }
